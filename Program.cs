@@ -6,7 +6,7 @@ class Program
     {
         using (var wad = new Wad("DOOM.WAD"))
         {
-            var mus = new Mus(wad.ReadLump("D_E1M1"));
+            MusTest.Test(wad.ReadLump("D_E1M1"));
         }
     }
 }
