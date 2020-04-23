@@ -77,7 +77,16 @@ public static class MusTest
                     Console.WriteLine("    // Release note");
                     Console.WriteLine("    releaseNote = " + releaseNote);
 
-                    actions.Add(() => synth.NoteOff(channelNumber, releaseNote));
+                    actions.Add(() =>
+                    {
+                        var cn = channelNumber;
+                        var rn = releaseNote;
+                        if (cn == 15)
+                        {
+                            cn = 9;
+                        }
+                        synth.NoteOff(cn, rn);
+                    });
 
                     break;
 
@@ -93,7 +102,16 @@ public static class MusTest
                         Console.WriteLine("    noteVolume = " + noteVolume);
                     }
 
-                    actions.Add(() => synth.NoteOn(channelNumber, noteNumber, 100));
+                    actions.Add(() =>
+                    {
+                        var cn = channelNumber;
+                        var nn = noteNumber;
+                        if (cn == 15)
+                        {
+                            cn = 9;
+                        }
+                        synth.NoteOn(cn, nn, 100);
+                    });
 
                     break;
 
@@ -123,7 +141,12 @@ public static class MusTest
 
                     if (controllerNumber == 0)
                     {
-                        actions.Add(() => synth.ProcessMidiMessage(channelNumber, 0xC0, controllerValue, 0));
+                        actions.Add(() =>
+                        {
+                            var cn = channelNumber;
+                            var cv = controllerValue;
+                            synth.ProcessMidiMessage(cn, 0xC0, cv, 0);
+                        });
                     }
 
                     break;
