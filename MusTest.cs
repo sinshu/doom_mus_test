@@ -17,12 +17,13 @@ public static class MusTest
     // Now the synthesizer seems to work, but everything is played as piano. Why???
     public static void Test(byte[] data)
     {
-        var format = new WaveFormat(44100, 16, 2);
+        var sf = 44100;
+        var format = new WaveFormat(sf, 16, 2);
         var writer = new WaveFileWriter("out.wav", format);
 
         CheckHeader(data);
 
-        var synth = new Synthesizer(44100, 2);
+        var synth = new Synthesizer(sf, 2, sf / 140, 1);
         synth.LoadBank("TimGM6mb.sf2");
         var outBuf = new byte[synth.RawBufferSize];
 
@@ -57,6 +58,7 @@ public static class MusTest
 
         var p = scoreStart;
         var actions = new List<Action>();
+        var lastVels = new int[16];
         while (true)
         {
             var channelNumber = data[p] & 0xF;
@@ -106,11 +108,20 @@ public static class MusTest
                     {
                         var cn = channelNumber;
                         var nn = noteNumber;
+                        var nv = noteVolume;
                         if (cn == 15)
                         {
                             cn = 9;
                         }
-                        synth.NoteOn(cn, nn, 100);
+                        if (nv != -1)
+                        {
+                            lastVels[cn] = nv;
+                        }
+                        else
+                        {
+                            nv = lastVels[cn];
+                        }
+                        synth.NoteOn(cn, nn, nv);
                     });
 
                     break;
@@ -128,6 +139,8 @@ public static class MusTest
 
                     Console.WriteLine("    // System event");
                     Console.WriteLine("    systemEvent = " + systemEvent);
+
+                    Console.ReadKey();
 
                     break;
 
@@ -147,6 +160,28 @@ public static class MusTest
                             var cv = controllerValue;
                             synth.ProcessMidiMessage(cn, 0xC0, cv, 0);
                         });
+                    }
+                    else if (controllerNumber == 3)
+                    {
+                        actions.Add(() =>
+                        {
+                            var cn = channelNumber;
+                            var cv = controllerValue;
+                            synth.ProcessMidiMessage(cn, 0xB0, 0x07, cv);
+                        });
+                    }
+                    else if (controllerNumber == 4)
+                    {
+                        actions.Add(() =>
+                        {
+                            var cn = channelNumber;
+                            var cv = controllerValue;
+                            synth.ProcessMidiMessage(cn, 0xB0, 0x0A, cv);
+                        });
+                    }
+                    else
+                    {
+                        Console.ReadKey();
                     }
 
                     break;

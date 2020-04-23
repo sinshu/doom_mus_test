@@ -219,7 +219,7 @@ namespace AudioSynthesis.Bank.Patches
             this.envList[1].DelayTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.DelayVolumeEnvelope] / 1200.0);
             this.envList[1].HoldTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.HoldVolumeEnvelope] / 1200.0);
             this.envList[1].PeakLevel = 1;
-            this.envList[1].ReleaseTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.ReleaseVolumeEnvelope] / 1200.0);
+            this.envList[1].ReleaseTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.ReleaseVolumeEnvelope] / 1200.0) / 10;
             this.envList[1].StartLevel = 0;
             this.envList[1].SustainLevel = 1;
             //checks
