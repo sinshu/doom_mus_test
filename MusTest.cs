@@ -132,6 +132,20 @@ public static class MusTest
                     Console.WriteLine("    // Pitch wheel");
                     Console.WriteLine("    pitchWheel = " + pitchWheel);
 
+                    actions.Add(() =>
+                    {
+                        var cn = channelNumber;
+                        var pw = pitchWheel;
+                        if (cn == 15)
+                        {
+                            cn = 9;
+                        }
+                        var pw2 = (pw << 7) / 2;
+                        var pw1 = pw2 & 127;
+                        pw2 >>= 7;
+                        synth.ProcessMidiMessage(cn, 0xE0, pw1, pw2);
+                    });
+
                     break;
 
                 case 3:
@@ -140,7 +154,7 @@ public static class MusTest
                     Console.WriteLine("    // System event");
                     Console.WriteLine("    systemEvent = " + systemEvent);
 
-                    Console.ReadKey();
+                    //Console.ReadKey();
 
                     break;
 
@@ -181,7 +195,7 @@ public static class MusTest
                     }
                     else
                     {
-                        Console.ReadKey();
+                        //Console.ReadKey();
                     }
 
                     break;
@@ -208,7 +222,7 @@ public static class MusTest
                 while (true)
                 {
                     var value = data[p++];
-                    time = time * 128 + value & 127;
+                    time = time * 128 + (value & 127);
                     if ((value & 128) == 0)
                     {
                         break;
