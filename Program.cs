@@ -27,7 +27,7 @@ class Program
                 writer.Write(buffer, 0, buffer.Length);
                 sampleCount += MusDecoder.BufferLength;
 
-                if (sampleCount > 180 * MusDecoder.SampleRate)
+                if (sampleCount > 240 * MusDecoder.SampleRate)
                 {
                     break;
                 }

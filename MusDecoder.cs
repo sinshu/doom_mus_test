@@ -138,6 +138,11 @@ namespace ManagedDoom.Audio
                 }
             }
 
+            if ((data[p] & 0x70) >> 4 == 6)
+            {
+                return -1;
+            }
+
             return time;
         }
 
