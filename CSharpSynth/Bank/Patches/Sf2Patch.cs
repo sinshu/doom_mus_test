@@ -15,9 +15,9 @@ namespace AudioSynthesis.Bank.Patches
         private float initialAttn;
         private short keyOverride;
         private short velOverride;
-        private short keynumToModEnvHold ;
+        private short keynumToModEnvHold;
         private short keynumToModEnvDecay;
-        private short keynumToVolEnvHold ;
+        private short keynumToVolEnvHold;
         private short keynumToVolEnvDecay;
         private PanComponent pan;
         private short modLfoToPitch;
@@ -42,7 +42,7 @@ namespace AudioSynthesis.Bank.Patches
             voiceparams.envelopes[1].QuickSetup(voiceparams.synth.SampleRate, note, keynumToVolEnvHold, keynumToVolEnvDecay, susMod, this.EnvelopeInfo[1]);
             //setup filter
             //if (filterQ == 1 && modLfoToFilterFc + modEnvToFilterFc + iniFilterFc > 14000)
-                voiceparams.filters[0].Disable();
+            voiceparams.filters[0].Disable();
             //else
             //    voiceparams.filters[0].QuickSetup(44100, note, 1f, this.FilterInfo[0]);
             //setup lfos
@@ -53,7 +53,7 @@ namespace AudioSynthesis.Bank.Patches
             voiceparams.volOffset = -20.0f * (float)Math.Log10(16129.0 / (vel * vel)) + -initialAttn;
             //check if we have finished before we have begun
             return voiceparams.generatorParams[0].currentState != GeneratorStateEnum.Finished && voiceparams.envelopes[1].CurrentState != EnvelopeStateEnum.None;
-        }       
+        }
         public override void Stop(VoiceParameters voiceparams)
         {
             voiceparams.generators[0].Release(voiceparams.generatorParams[0]);
@@ -93,6 +93,18 @@ namespace AudioSynthesis.Bank.Patches
                 }
                 //--Volume calculation
                 float volume = (float)SynthHelper.DBtoLinear(voiceparams.volOffset + voiceparams.lfos[0].Value * modLfoToVolume) * voiceparams.envelopes[1].Value * voiceparams.synth.totalVolume[voiceparams.channel] * voiceparams.synth.MixGain;
+
+                /*
+                var th = 0.01F;
+                var amplitude = GetAmplitude(voiceparams);
+                var loudness = volume * amplitude;
+                if (loudness > th)
+                {
+                    volume *= th / loudness;
+                }
+                volume *= 5;
+                */
+
                 //--Mix block based on number of channels
                 if (voiceparams.synth.AudioChannels == 2)
                 {
@@ -144,7 +156,7 @@ namespace AudioSynthesis.Bank.Patches
             LoadLfos(region);
             LoadFilter(region);
         }
-        
+
         private void LoadGen(Sf2Region region, AssetManager assets)
         {
             SampleDataAsset sda = assets.SampleAssetList[region.Generators[(int)GeneratorEnum.SampleID]];
@@ -261,6 +273,21 @@ namespace AudioSynthesis.Bank.Patches
             this.fltrList[0].CutOff = 20000;
             this.fltrList[0].FilterMethod = FilterTypeEnum.BiquadLowpass;
             this.fltrList[0].Resonance = 1;
+        }
+
+        private float GetAmplitude(VoiceParameters vp)
+        {
+            var data = vp.blockBuffer;
+            var max = 0F;
+            for (var t = 0; t < data.Length; t++)
+            {
+                var a = data[t] > 0 ? data[t] : -data[t];
+                if (a > max)
+                {
+                    max = a;
+                }
+            }
+            return max;
         }
     }
 }

@@ -24,7 +24,7 @@ public static class MusTest
         CheckHeader(data);
 
         var synth = new Synthesizer(sf, 2, sf / 140, 1);
-        synth.LoadBank("TimGM6mb.sf2");
+        synth.LoadBank("GMBank.bank");
         var outBuf = new byte[synth.RawBufferSize];
 
         var scoreLen = (int)BitConverter.ToUInt16(data, 4);
@@ -191,6 +191,15 @@ public static class MusTest
                             var cn = channelNumber;
                             var cv = controllerValue;
                             synth.ProcessMidiMessage(cn, 0xB0, 0x0A, cv);
+                        });
+                    }
+                    else if (controllerNumber == 5)
+                    {
+                        actions.Add(() =>
+                        {
+                            var cn = channelNumber;
+                            var cv = controllerValue;
+                            synth.ProcessMidiMessage(cn, 0xB0, 0x0B, cv);
                         });
                     }
                     else
