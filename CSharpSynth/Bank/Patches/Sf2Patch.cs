@@ -226,10 +226,10 @@ namespace AudioSynthesis.Bank.Patches
                 this.envList[0].ReleaseTime = 100f;
             //volume env
             this.envList[1] = new EnvelopeDescriptor();
-            this.envList[1].AttackTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.AttackVolumeEnvelope] / 1200.0);
-            this.envList[1].DecayTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.DecayVolumeEnvelope] / 1200.0);
-            this.envList[1].DelayTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.DelayVolumeEnvelope] / 1200.0);
-            this.envList[1].HoldTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.HoldVolumeEnvelope] / 1200.0);
+            this.envList[1].AttackTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.AttackVolumeEnvelope] / 1200.0) / 10;
+            this.envList[1].DecayTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.DecayVolumeEnvelope] / 1200.0) / 10;
+            this.envList[1].DelayTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.DelayVolumeEnvelope] / 1200.0) / 10;
+            this.envList[1].HoldTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.HoldVolumeEnvelope] / 1200.0) / 10;
             this.envList[1].PeakLevel = 1;
             this.envList[1].ReleaseTime = (float)Math.Pow(2, region.Generators[(int)GeneratorEnum.ReleaseVolumeEnvelope] / 1200.0) / 10;
             this.envList[1].StartLevel = 0;

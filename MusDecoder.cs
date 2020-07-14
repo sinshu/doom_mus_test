@@ -280,6 +280,10 @@ namespace ManagedDoom.Audio
                         switch (me.Data1)
                         {
                             case 0: // PROGRAM CHANGE
+                                if (me.Channel == 9)
+                                {
+                                    break;
+                                }
                                 synthesizer.ProcessMidiMessage(me.Channel, 0xC0, me.Data2, 0);
                                 break;
 
