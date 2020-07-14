@@ -3,13 +3,16 @@ using AudioSynthesis;
 using AudioSynthesis.Synthesis;
 using NAudio.Wave;
 using ManagedDoom.Audio;
+using AudioSynthesis.Bank;
 
 class Program
 {
     static void Main(string[] args)
     {
         var synthesizer = new Synthesizer(MusDecoder.SampleRate, 2, MusDecoder.BufferLength, 1);
-        synthesizer.LoadBank("TimGM6mb.sf2");
+        var bank = new PatchBank("TimGM6mb.sf2");
+
+        synthesizer.LoadBank(bank);
         var buffer = new byte[synthesizer.RawBufferSize];
 
         var format = new WaveFormat(MusDecoder.SampleRate, 16, 2);

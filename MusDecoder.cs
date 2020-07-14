@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using AudioSynthesis;
+using AudioSynthesis.Sf2;
 using AudioSynthesis.Synthesis;
 
 namespace ManagedDoom.Audio
@@ -16,7 +17,7 @@ namespace ManagedDoom.Audio
             (byte)'M',
             (byte)'U',
             (byte)'S',
-            0x1A,
+            0x1A
         };
 
         private byte[] data;
@@ -38,6 +39,8 @@ namespace ManagedDoom.Audio
 
         public MusDecoder(byte[] data, bool loop)
         {
+            CheckHeader(data);
+
             this.data = data;
             this.loop = loop;
 
@@ -64,6 +67,17 @@ namespace ManagedDoom.Audio
             Reset();
         }
 
+        private static void CheckHeader(byte[] data)
+        {
+            for (var p = 0; p < header.Length; p++)
+            {
+                if (data[p] != header[p])
+                {
+                    throw new Exception("Invalid format!");
+                }
+            }
+        }
+
         public void FillBuffer(Synthesizer synthesizer, byte[] buffer)
         {
             if (delay > 0)
@@ -87,7 +101,13 @@ namespace ManagedDoom.Audio
 
         private void Reset()
         {
+            for (var i = 0; i < lastVolume.Length; i++)
+            {
+                lastVolume[i] = 0;
+            }
+
             p = scoreStart;
+
             delay = 0;
         }
 
@@ -231,38 +251,60 @@ namespace ManagedDoom.Audio
                 var me = events[i];
                 switch (me.Type)
                 {
-                    case 0:
+                    case 0: // RELEASE NOTE
                         synthesizer.NoteOff(me.Channel, me.Data1);
                         break;
 
-                    case 1:
+                    case 1: // PLAY NOTE
                         synthesizer.NoteOn(me.Channel, me.Data1, me.Data2);
                         break;
 
-                    case 2:
+                    case 2: // PITCH WHEEL
                         synthesizer.ProcessMidiMessage(me.Channel, 0xE0, me.Data1, me.Data2);
                         break;
 
-                    case 3:
-                        break;
-
-                    case 4:
+                    case 3: // SYSTEM EVENT
                         switch (me.Data1)
                         {
-                            case 0:
+                            case 11: // ALL NOTES OFF
+                                synthesizer.NoteOffAll(true);
+                                break;
+
+                            case 14: // RESET ALL CONTROLS
+                                synthesizer.ResetSynthControls();
+                                break;
+                        }
+                        break;
+
+                    case 4: // CONTROL CHANGE
+                        switch (me.Data1)
+                        {
+                            case 0: // PROGRAM CHANGE
                                 synthesizer.ProcessMidiMessage(me.Channel, 0xC0, me.Data2, 0);
                                 break;
 
-                            case 3:
+                            case 1: // BANK SELECTION
+                                synthesizer.ProcessMidiMessage(me.Channel, 0xB0, 0x00, me.Data2);
+                                break;
+
+                            case 2: // MODULATION
+                                synthesizer.ProcessMidiMessage(me.Channel, 0xB0, 0x01, me.Data2);
+                                break;
+
+                            case 3: // VOLUME
                                 synthesizer.ProcessMidiMessage(me.Channel, 0xB0, 0x07, me.Data2);
                                 break;
 
-                            case 4:
+                            case 4: // PAN
                                 synthesizer.ProcessMidiMessage(me.Channel, 0xB0, 0x0A, me.Data2);
                                 break;
 
-                            case 5:
+                            case 5: // EXPRESSION
                                 synthesizer.ProcessMidiMessage(me.Channel, 0xB0, 0x0B, me.Data2);
+                                break;
+
+                            case 8: // PEDAL
+                                synthesizer.ProcessMidiMessage(me.Channel, 0xB0, 0x40, me.Data2);
                                 break;
                         }
                         break;
